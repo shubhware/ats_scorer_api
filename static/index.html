@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Campus Recruitment System | AI Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .gradient-bg { background: linear-gradient(135deg, #1e293b 0%, #334155 100%); }
+        .tab-active { border-bottom: 4px solid #3b82f6; color: #3b82f6; }
+    </style>
+</head>
+<body class="bg-slate-50 min-h-screen">
+
+    <header class="gradient-bg text-white py-8 px-4 shadow-lg">
+        <div class="max-w-6xl mx-auto flex justify-between items-center">
+            <div>
+                <h1 class="text-3xl font-bold tracking-tight">Smart Campus AI</h1>
+                <p class="text-slate-300 text-sm mt-1">Next-Gen Resume Analysis & Career Bridge</p>
+            </div>
+            <div class="hidden md:block text-right">
+                <p class="text-xs uppercase tracking-widest text-slate-400">Project Status</p>
+                <p class="text-sm font-mono text-green-400">● System Online</p>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto py-10 px-4">
+        
+        <div class="flex border-b border-slate-200 mb-8 space-x-8">
+            <button onclick="switchTab('analyze')" id="tab-analyze" class="pb-4 px-2 font-bold text-lg tab-active transition-all">
+                <i class="fas fa-search-plus mr-2"></i>Analyze Resume
+            </button>
+            <button onclick="switchTab('trends')" id="tab-trends" class="pb-4 px-2 font-bold text-lg text-slate-500 hover:text-blue-500 transition-all">
+                <i class="fas fa-chart-line mr-2"></i>Market Trends
+            </button>
+        </div>
+
+        <div id="section-analyze" class="space-y-8 animate-fadeIn">
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-8">
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div>
+                        <label class="block text-slate-700 font-bold mb-3 italic">Step 1: Paste Job Description</label>
+                        <textarea id="jd" rows="6" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none bg-slate-50 transition-all" placeholder="Paste the job requirements here..."></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-slate-700 font-bold mb-3 italic">Step 2: Upload Resume (PDF)</label>
+                        <div class="border-2 border-dashed border-slate-200 rounded-xl p-8 bg-slate-50 text-center hover:border-blue-400 transition-all">
+                            <input type="file" id="resumeFile" accept=".pdf" class="hidden">
+                            <label for="resumeFile" class="cursor-pointer">
+                                <i class="fas fa-cloud-upload-alt text-4xl text-slate-400 mb-4"></i>
+                                <p class="text-slate-600 font-medium" id="fileNameDisplay">Click to select your PDF file</p>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <button onclick="analyzeResume()" id="analyzeBtn" class="w-full mt-8 bg-blue-600 text-white font-bold py-4 rounded-xl hover:bg-blue-700 shadow-lg shadow-blue-200 transition-all flex items-center justify-center">
+                    <span id="btnText">Run AI Engine</span>
+                </button>
+            </div>
+
+            <div id="results" class="hidden space-y-6">
+                
+                <div class="bg-white rounded-2xl shadow-sm p-8 border-l-8" id="verdictCard">
+                    <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+                        <div>
+                            <h2 class="text-3xl font-black text-slate-800" id="resVerdict">Verdict</h2>
+                            <p class="text-slate-500 font-medium" id="candidateName"></p>
+                        </div>
+                        <div class="text-center md:text-right">
+                            <span class="text-6xl font-black text-blue-600" id="resScore">0%</span>
+                            <p class="text-xs font-bold text-slate-400 tracking-widest mt-1">ATS MATCH SCORE</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="tipsArea" class="hidden bg-indigo-50 p-6 rounded-2xl border border-indigo-100">
+                    <h3 class="font-bold text-indigo-900 mb-3 flex items-center">
+                        <i class="fas fa-magic mr-3"></i>Semantic Optimization Tips
+                    </h3>
+                    <ul id="tipsList" class="list-disc ml-6 text-indigo-800 text-sm space-y-2"></ul>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                        <h3 class="font-bold text-slate-800 mb-4 flex items-center"><i class="fas fa-check-circle text-emerald-500 mr-2"></i>Skills Detected</h3>
+                        <div id="skillsFound" class="flex flex-wrap gap-2"></div>
+                    </div>
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                        <h3 class="font-bold text-slate-800 mb-4 flex items-center"><i class="fas fa-times-circle text-rose-500 mr-2"></i>Skills Missing</h3>
+                        <div id="skillsMissing" class="flex flex-wrap gap-2"></div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-2xl shadow-sm p-8 border border-slate-100">
+                    <h3 class="text-2xl font-bold mb-8 text-slate-900 flex items-center">
+                        <i class="fas fa-map-signs mr-3 text-blue-500"></i>Personalized Learning Roadmap
+                    </h3>
+                    <div id="roadmapArea" class="space-y-10"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="section-trends" class="hidden animate-fadeIn">
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-8">
+                <div class="flex justify-between items-center mb-10">
+                    <div>
+                        <h2 class="text-2xl font-bold text-slate-900">Top 30 Trending Skills</h2>
+                        <p class="text-slate-500 text-sm">Based on LinkedIn Real-time Market Data</p>
+                    </div>
+                    <i class="fas fa-bolt text-amber-400 text-2xl"></i>
+                </div>
+                <div id="trendsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        // Update file name display
+        document.getElementById('resumeFile').addEventListener('change', function(e) {
+            document.getElementById('fileNameDisplay').innerText = e.target.files[0].name;
+            document.getElementById('fileNameDisplay').classList.add('text-blue-600', 'font-bold');
+        });
+
+        function switchTab(tab) {
+            const tabs = ['analyze', 'trends'];
+            tabs.forEach(t => {
+                document.getElementById(`section-${t}`).classList.add('hidden');
+                document.getElementById(`tab-${t}`).classList.remove('tab-active');
+                document.getElementById(`tab-${t}`).classList.add('text-slate-500');
+            });
+            document.getElementById(`section-${tab}`).classList.remove('hidden');
+            document.getElementById(`tab-${tab}`).classList.add('tab-active');
+            document.getElementById(`tab-${tab}`).classList.remove('text-slate-500');
+            if(tab === 'trends') loadTrends();
+        }
+
+        async function loadTrends() {
+            const grid = document.getElementById('trendsGrid');
+            grid.innerHTML = '<p class="col-span-full text-center py-20 text-slate-400">Syncing with Industry Database...</p>';
+            try {
+                const res = await fetch('/market-trends');
+                const data = await res.json();
+                grid.innerHTML = data.trending_skills.slice(0, 30).map((s, i) => `
+                    <div class="p-4 bg-slate-50 border border-slate-100 rounded-xl flex items-center justify-between group hover:bg-white hover:border-blue-400 hover:shadow-md transition-all">
+                        <div class="flex items-center">
+                            <span class="text-slate-300 font-bold mr-4 text-xl italic">${i+1}</span>
+                            <span class="font-bold text-slate-700 capitalize">${s['Technical Skill']}</span>
+                        </div>
+                        <i class="fas fa-arrow-trend-up text-blue-300 group-hover:text-blue-500"></i>
+                    </div>
+                `).join('');
+            } catch(e) { grid.innerHTML = "Sync Error."; }
+        }
+
+        async function analyzeResume() {
+            const jd = document.getElementById('jd').value;
+            const file = document.getElementById('resumeFile').files[0];
+            const btn = document.getElementById('analyzeBtn');
+
+            if (!jd || !file) return alert("Please provide both Job Description and Resume!");
+
+            btn.disabled = true;
+            document.getElementById('btnText').innerText = "AI ENGINE PROCESSING...";
+
+            const form = new FormData();
+            form.append('job_description', jd);
+            form.append('file', file);
+
+            try {
+                const res = await fetch('/analyze-resume', { method: 'POST', body: form });
+                const data = await res.json();
+
+                document.getElementById('results').classList.remove('hidden');
+                document.getElementById('resVerdict').innerText = data.verdict;
+                document.getElementById('resScore').innerText = data.ats_match_score;
+                document.getElementById('candidateName').innerText = `File: ${data.candidate_file}`;
+
+                const card = document.getElementById('verdictCard');
+                const score = parseFloat(data.ats_match_score);
+                card.style.borderLeftColor = score >= 75 ? '#10b981' : '#f59e0b';
+
+                // Tips Logic
+                const tipsArea = document.getElementById('tipsArea');
+                if(data.optimization_tips.length > 0) {
+                    tipsArea.classList.remove('hidden');
+                    document.getElementById('tipsList').innerHTML = data.optimization_tips.map(t => `<li>${t}</li>`).join('');
+                } else { tipsArea.classList.add('hidden'); }
+
+                // Skills
+                document.getElementById('skillsFound').innerHTML = data.skills_found.map(s => `<span class="bg-emerald-50 text-emerald-700 px-3 py-1 rounded-lg text-sm font-bold border border-emerald-100">${s}</span>`).join('');
+                document.getElementById('skillsMissing').innerHTML = data.skills_missing.map(s => `<span class="bg-rose-50 text-rose-700 px-3 py-1 rounded-lg text-sm font-bold border border-rose-100">${s}</span>`).join('');
+
+                // Roadmap Logic
+                document.getElementById('roadmapArea').innerHTML = data.recommendation_roadmap.map(item => `
+                    <div class="relative pl-10">
+                        <div class="absolute left-0 top-0 w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold shadow-lg shadow-blue-200">
+                            ${item.skill[0]}
+                        </div>
+                        <h4 class="text-xl font-bold text-slate-800 mb-4 italic underline decoration-blue-200 decoration-4">
+                            Bridging: ${item.skill} 
+                            <span class="text-xs font-black uppercase tracking-tighter bg-blue-100 text-blue-600 px-3 py-1 rounded-full ml-4">${item.market_priority} Priority</span>
+                        </h4>
+                        <div class="grid md:grid-cols-2 gap-4">
+                            ${item.courses.map(c => `
+                                <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-all flex flex-col justify-between">
+                                    <div>
+                                        <p class="font-bold text-slate-900 leading-tight mb-2">${c.title}</p>
+                                        <p class="text-xs text-slate-500 font-medium italic">${c.provider} • ${c.rating} ⭐</p>
+                                    </div>
+                                    <a href="${c.url}" target="_blank" class="mt-5 text-center bg-slate-900 text-white py-2 rounded-lg font-bold text-xs hover:bg-blue-600 transition-all uppercase tracking-widest">Start Learning</a>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `).join('');
+
+                window.scrollTo({ top: document.getElementById('results').offsetTop - 50, behavior: 'smooth' });
+
+            } catch (e) { alert("Server connectivity error."); }
+
+            btn.disabled = false;
+            document.getElementById('btnText').innerText = "Run AI Engine";
+        }
+    </script>
+</body>
+</html>

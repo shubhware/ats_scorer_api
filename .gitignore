@@ -1,0 +1,31 @@
+# Python environment
+__pycache__/
+*.py[cod]
+*$py.class
+.venv
+env/
+venv/
+.env
+
+# Jupyter Notebooks
+.ipynb_checkpoints
+
+# OS Specific
+.DS_Store
+
+# Large AI Model Files (Keep the folder structure, ignore the heavy weights)
+app/core/models/ner_model/model-best/vocab/
+app/core/models/ner_model/model-best/tok2vec/
+app/core/models/ner_model/model-best/ner/
+app/core/models/course_vectors/*.pt
+app/core/models/
+
+# Temporary files
+temp_*.pdf
+static/temp/
+# Large Data & Models
+data/job_postings/
+*.safetensors
+*.csv
+*.pt
+*.pkl
